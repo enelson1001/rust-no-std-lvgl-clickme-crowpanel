@@ -142,3 +142,5 @@ Data from xtensa-esp32s3-elf-nm --size-sort -r bin_file_name
  
 
  ## Picture of Clickme running on Elecrow 7 inch Elecrow crowpanel
+After running a bit to get to show some counts
+![esp32s3-clickme](photos/clickme-elecrow-crowpanel.jpg)
