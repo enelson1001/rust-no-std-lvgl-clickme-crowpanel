@@ -34,7 +34,7 @@ impl ClickMePage {
             lv_obj_align(count_label, LV_ALIGN_TOP_MID as u8, 0, 40);
             lv_obj_set_style_text_color(count_label, COLOR_BLACK, 0);
             lv_obj_set_style_text_font(count_label, &lv_font_montserrat_28, 0);
-            //lv_obj_set_style_text_font(count_label, &gotham_bold_80, 0); // to try a custom font(digits 0-9) comment ou previous line
+            //lv_obj_set_style_text_font(count_label, &gotham_bold_80, 0); // to try a custom font(digits 0-9) comment out previous line
             lv_label_set_text(count_label, c"0".as_ptr());
 
             // --- Create Button ---
@@ -67,7 +67,7 @@ impl ClickMePage {
     pub fn set_counter_value(&self, value: u32) {
         // Create a fixed-capacity string on the stack (16 or 32 bytes is plenty)
         let mut s: String<32> = String::new();
-        if write!(s, "{}", value).is_ok() {
+        if write!(s, "{}\0", value).is_ok() {
             unsafe {
                 lv_label_set_text(self.count_label, s.as_ptr() as *const _);
             }

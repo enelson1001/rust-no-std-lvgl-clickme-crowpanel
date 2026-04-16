@@ -21,6 +21,7 @@ use esp_hal::{
             dpi::{self, Dpi, Format, FrameTiming},
         },
     },
+    ram,
     time::Rate,
     timer::timg::TimerGroup,
 };
@@ -40,7 +41,7 @@ use gt911::Gt911;
 
 use embedded_hal_async::i2c::I2c as _;
 
-use rust_no_std_lvgl_clickme::{
+use rust_no_std_lvgl_clickme_crowpanel::{
     FB1_ADDR, FRAMEBUFFER_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH,
     bounce_buffer_dma::{BounceBufferDma, fill_bounce_buffer},
     clickme_page::{BTN_CLICKED, ClickMePage},
@@ -205,7 +206,7 @@ async fn main(spawner: Spawner) -> ! {
     // Allocate framebuffer in PSRAM, Box::leak(vec![...]) ensures this lands in the PSRAM heap
     let fb1_raw: &'static mut [u8] = Box::leak(vec![0x00u8; FRAMEBUFFER_SIZE].into_boxed_slice());
     let fb1_ptr = fb1_raw.as_mut_ptr();
-    FB1_ADDR.store(fb1_ptr, Ordering::Relaxed);
+    FB1_ADDR.store(fb1_ptr, Ordering::Release);
 
     // For testing; won't be displayed if using lvgl page because lvgl page will overwrite
     // But if we want a test to see if display is working we can comment out the following
@@ -252,6 +253,7 @@ async fn main(spawner: Spawner) -> ! {
     }
 }
 
+#[ram]
 #[embassy_executor::task]
 async fn display_engine_task(mut dpi: Dpi<'static, Blocking>, mut bb_dma: BounceBufferDma) {
     // If clock is 240MHz, this is 466 * 240.
@@ -271,7 +273,7 @@ async fn display_engine_task(mut dpi: Dpi<'static, Blocking>, mut bb_dma: Bounce
 
         // 2. Chunk Loop, one chunk equals 12 lines
         let mut current_chunk = 0;
-        while current_chunk < 40 {
+        while current_chunk < 39 {
             let start_of_chunk = xtensa_lx::timer::get_cycle_count();
             // While the previous chunk is in flight to the display fill the next chunk
             let next_chunk = current_chunk + 1;
